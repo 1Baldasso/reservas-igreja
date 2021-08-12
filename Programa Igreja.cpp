@@ -9,8 +9,8 @@
 
 using namespace std;
 
-    int i = 0;
-    string a;
+    int i = 0,m = 0;
+    string a,missaAtual;
 
 class Igreja {
     public:
@@ -36,7 +36,7 @@ class lugaresDisp {
     }
 };
 
-lugaresDisp disponiveis;
+    lugaresDisp disponiveis;
 
 class lugaresOcu {
     public:
@@ -50,20 +50,24 @@ class lugaresOcu {
     }
 };
 
-lugaresOcu ocupados;
+    lugaresOcu ocupados;
 
 class Missa{
     public:
-    string celebrante;
-    string horario;
+    string celebrante[50];
+    string horario[50];
+    string diaSemana[50];
+    string diaMes[50];
     Missa(){};
     void adicionarReserva(int quantReser){
         disponiveis.adicionarLugares(quantReser);
         ocupados.adicionarLugares(quantReser);
     }
-    void novaMissa(string aCelebrante, string aHorario){
-        celebrante=aCelebrante;
-        horario=aHorario;
+    void novaMissa(string aCelebrante, string aHorario, string aSemana, string aMes){
+        celebrante[m]=aCelebrante;
+        horario[m]=aHorario;
+        diaSemana[m]=aSemana;
+        diaMes[m]=aMes;
         disponiveis.quantidade=igreja.lugaresTotais;
         disponiveis.quantidade=0;
     }
@@ -104,7 +108,7 @@ void verificarAPI(){
     ofstream api_s;
     string teste;
 
-    api_r.open("api.txt");
+    api_r.open(missaAtual);
     if(api_r.is_open()){
         getline(api_r, teste);
         if(teste.length()>0){
@@ -114,11 +118,14 @@ void verificarAPI(){
             api_r.close();
         }
     } else {
-        api_s.open("api.txt");
+        api_s.open(missaAtual);
         api_s.close();
     }
     system("CLS");
 }
+
+
+
 int gerarCodigo(){
     int codigo;
     unsigned seed = time(NULL);
@@ -132,15 +139,19 @@ int gerarCodigo(){
     return codigo;
 
 }
+
+void criarArquivo(string arquivo){
+    ofstream arq;
+    arq.open(arquivo);
+    missaAtual=arquivo;
+}
 void iterarAPI(){
 
     ifstream api_r;
     string qtP, code, nome, telefone, endereco;
     int quantPe, codigo;
 
-
-    cout << "estou aqui" << endl;
-    api_r.open("api.txt");
+    api_r.open(missaAtual);
     if(api_r.is_open()){
         i=0;
         for(int j=0;!api_r.eof();j++){
@@ -167,7 +178,7 @@ void iterarAPI(){
 void adicionarAPI(){
     ofstream api_s;
 
-    api_s.open("api.txt");
+    api_s.open(missaAtual);
     if(api_s.is_open()){
 
         for(int j=0;j<i;j++){
@@ -203,8 +214,16 @@ void listarReservas(){
     inicio();
 
 }
-
-
+void escolherMissa(){
+    int escolha;
+    cout << "VOCÊ DESEJA ACESSAR QUAL MISSA?" << endl;
+    for (int j=0;j<m;j++){
+        cout << j+1 << " - Padre: " << missa.celebrante[j] << "missa de " << missa.diaSemana[j] << "  dia " << missa.diaMes[j] << " ás " << missa.horario[j] << endl;
+    }
+    cin >> escolha;
+    escolha=escolha-1;
+    missaAtual=missa.diaMes[escolha]+"_"+missa.diaSemana[escolha]+"_"+missa.horario[escolha];
+}
 void criarReserva(){
     string nome, endereco, telefone;
     int quantRes, codigo;
@@ -243,9 +262,6 @@ void criarReserva(){
 }
 
 void limparReservas(){
-    ofstream api_s;
-    api_s.open("api.txt");
-    api_s.clear();
     for (int j=0; j<=i;j++){
         reservas.nome[j]='\0';
         reservas.endereco[j]='\0';
@@ -260,16 +276,22 @@ void limparReservas(){
 }
 
 void criarNovaMissa(){
-    string padre, horario;
+    string padre, horario, arquivo, diaSemana, diaMes;
     limpa;
 
     cout << "INSIRA O NOME DO PADRE QUE CELEBRARÁ A MISSA" << endl;
     cin >> padre;
+    cout << "INSIRA O DIA DA SEMANA DA MISSA" << endl;
+    cin >> diaSemana;
+    cout << "INSIRA O DIA DO MÊS DA MISSA" << endl;
+    cin >> diaMes;
     cout <<  "\n INSIRA O HORÁRIO DA MISSA NO FORMATO 24H" << endl;
     cin >> horario;
 
-    missa.novaMissa(padre, horario);
-    limparReservas();
+    missa.novaMissa(padre, horario, diaSemana, diaMes);
+    arquivo=diaMes+"_"+diaSemana+"_"+horario;
+    criarArquivo(arquivo);
+    m++;
     inicio();
 
 }
