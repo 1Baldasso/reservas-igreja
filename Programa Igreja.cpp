@@ -2,6 +2,8 @@
 #include <locale.h>
 #include <fstream>
 #include <string>
+#include <stdlib.h>
+#include <time.h>
 
 #define limpa system("CLS")
 
@@ -117,7 +119,19 @@ void verificarAPI(){
     }
     system("CLS");
 }
+int gerarCodigo(){
+    int codigo;
+    unsigned seed = time(NULL);
+    srand(seed);
+    codigo=rand() % 37 + 1;
+    for (int j=0; j<i ;j++){
+        if (codigo==reservas.codigo[j]){
+            codigo = gerarCodigo();
+        }
+    }
+    return codigo;
 
+}
 void iterarAPI(){
 
     ifstream api_r;
@@ -196,7 +210,7 @@ void criarReserva(){
     int quantRes, codigo;
 
     limpa;
-    codigo=37*(i+1);
+    codigo=gerarCodigo();
     cout << "LUGARES DISPONÍVEIS: " << disponiveis.quantidade << "\n\n\n";
     cout << "RESPONSÁVEL PELA RESERVA" << endl;
     cout << "NOME:" << endl;
@@ -218,7 +232,11 @@ void criarReserva(){
     }
     cout << "NÚMERO DE PESSOAS:" << endl;
     cin >> quantRes;
+
     reservas.adicionarReserva(nome, endereco ,telefone ,quantRes, codigo);
+    cout << "Reserva feita com sucesso! Código da reserva: " << codigo << endl;
+    cout << "PRESSIONE ENTER PARA VOLTAR A TELA INICIAL" << endl;
+    system ("pause");
     i++;
     adicionarAPI();
     inicio();
