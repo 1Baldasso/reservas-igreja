@@ -287,7 +287,10 @@ void criarReserva(){
     }
     cout << "NÚMERO DE PESSOAS:" << endl;
     cin >> quantRes;
-
+    while(quantRes>disponiveis.quantidade){
+        cout << "Quantidade maior que o disponível" << endl;
+        cin >> quantRes;
+    }
     reservas.adicionarReserva(nome, endereco ,telefone ,quantRes, codigo);
     cout << "Reserva feita com sucesso! Código da reserva: " << codigo << endl;
     cout << "PRESSIONE ENTER PARA VOLTAR A TELA INICIAL" << endl;
