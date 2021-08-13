@@ -58,18 +58,21 @@ class Missa{
     string horario[50];
     string diaSemana[50];
     string diaMes[50];
+    string arquivo[50];
     Missa(){};
     void adicionarReserva(int quantReser){
         disponiveis.adicionarLugares(quantReser);
         ocupados.adicionarLugares(quantReser);
     }
-    void novaMissa(string aCelebrante, string aHorario, string aSemana, string aMes){
+    void novaMissa(string aCelebrante, string aHorario, string aSemana, string aMes,string aArq){
         celebrante[m]=aCelebrante;
         horario[m]=aHorario;
         diaSemana[m]=aSemana;
         diaMes[m]=aMes;
+        arquivo[m]=aArq;
         disponiveis.quantidade=igreja.lugaresTotais;
         disponiveis.quantidade=0;
+        m++;
     }
 };
 
@@ -174,7 +177,21 @@ void iterarAPI(){
 
 
 }
-
+void recuperarMissas(){
+    ifstream arq;
+    string arquivo,celebrante,diaMes,diaSemana,horario;
+    arq.open("missas.txt");
+    if(arq.is_open()){
+        for(int j=0;!arq.eof();j++){
+            getline(arq, arquivo);
+            getline(arq, celebrante);
+            getline(arq, diaMes);
+            getline(arq, diaSemana);
+            getline(arq, horario);
+            missa.novaMissa(celebrante, horario, diaSemana, diaMes, arquivo);
+        }
+    }
+}
 void adicionarAPI(){
     ofstream api_s;
 
@@ -196,20 +213,39 @@ void adicionarAPI(){
         cout << "Nao foi possivel abrir o arquivo.\n";
     }
 }
+void adicionarAPI(string arquivo){
+    ofstream arq;
+    arq.open("missas.txt");
+    if(arq.is_open()){
+        for(int j=0;j<m;j++){
+            arq << missa.arquivo[j] << '\n';
+            arq << missa.celebrante[j] << '\n';
+            arq << missa.diaMes[j] << '\n';
+            arq << missa.diaSemana[j] << '\n';
+            if (j==m-1){
+                arq << missa.horario[j];
+            }else {
+                arq << missa.horario[j] << '\n';
+            }
 
+        }
+
+    }
+    arq.close();
+}
 void listarReservas(){
     cout << "Lugares disponíveis: " << disponiveis.quantidade << endl;
     cout << "Lugares ocupados: " << ocupados.quantidade << endl << endl;
     for(int j=0; j<i;j++){
-        cout << "Reserva número " << j+1 << endl << endl;
-        cout << "Nome responsável da reserva: \n    " << reservas.nome[j] << endl << endl;
-        cout << "Endereço: \n    " << reservas.endereco[j] << endl << endl;
-        cout << "Telefone: \n    "<< reservas.telefone[j] << endl << endl;
-        cout << "Quantidade de Pessoas: \n    " << reservas.quantidadePessoas[j] << endl << endl;
-        cout << "Codigo da Reserva: \n    " << reservas.codigo[j] << endl << endl;
+        cout << "- Reserva número " << j+1 << endl << endl;
+        cout << "- Nome responsável da reserva: \n    " << reservas.nome[j] << endl << endl;
+        cout << "- Endereço: \n    " << reservas.endereco[j] << endl << endl;
+        cout << "- Telefone: \n    "<< reservas.telefone[j] << endl << endl;
+        cout << "- Quantidade de Pessoas: \n    " << reservas.quantidadePessoas[j] << endl << endl;
+        cout << "- Codigo da Reserva: \n    " << reservas.codigo[j] << endl << endl;
         cout << endl << endl;
     }
-    cout << "Pressione enter para voltar à tela inicial" << endl;
+    cout << "PRESSIONE ENTER PARA VOLTAR à TELA INICIAL" << endl;
     system("pause");
     inicio();
 
@@ -288,12 +324,11 @@ void criarNovaMissa(){
     cout <<  "\n INSIRA O HORÁRIO DA MISSA NO FORMATO 24H" << endl;
     cin >> horario;
 
-    missa.novaMissa(padre, horario, diaSemana, diaMes);
     arquivo=diaMes+"_"+diaSemana+"_"+horario;
+    missa.novaMissa(padre, horario, diaSemana, diaMes, arquivo);
     criarArquivo(arquivo);
-    m++;
+    adicionarAPI(arquivo);
     inicio();
-
 }
 void validarCodigo(){
     limpa;
@@ -302,16 +337,16 @@ void validarCodigo(){
     cin >> codigo;
     for (int j=0;j<i;j++){
         if (codigo==reservas.codigo[j]){
-            cout << "Código válido!" << endl << "Pertencente a reserva número " << j+1 << endl << endl;
-            cout << "Nome responsável da reserva: \n    " << reservas.nome[j] << endl << endl;
-            cout << "Endereço: \n    " << reservas.endereco[j] << endl << endl;
-            cout << "Telefone: \n    "<< reservas.telefone[j] << endl << endl;
-            cout << "Quantidade de Pessoas: \n    " << reservas.quantidadePessoas[j] << endl << endl;
-            cout << "Codigo da Reserva: \n    " << reservas.codigo[j] << endl << endl;
+            cout << "- Código válido!" << endl << "Pertencente a reserva número " << j+1 << endl << endl;
+            cout << "- Nome responsável da reserva: \n    " << reservas.nome[j] << endl << endl;
+            cout << "- Endereço: \n    " << reservas.endereco[j] << endl << endl;
+            cout << "- Telefone: \n    "<< reservas.telefone[j] << endl << endl;
+            cout << "- Quantidade de Pessoas: \n    " << reservas.quantidadePessoas[j] << endl << endl;
+            cout << "- Codigo da Reserva: \n    " << reservas.codigo[j] << endl << endl;
             cout << endl << endl;
             break;
         } else if(j==i-1){
-            cout << "Código inválido" << endl;
+            cout << "- Código inválido" << endl;
         }
     }
     cout << "Pressione enter para continuar" << endl;
